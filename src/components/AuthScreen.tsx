@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Icon from "@/components/ui/icon";
 
 type AuthStep = "welcome" | "phone" | "code" | "name" | "done";
 
 interface Props {
   onLogin: (name: string, username: string) => void;
+  onTelegramLogin?: (tgData: Record<string, string>) => void;
 }
 
-export default function AuthScreen({ onLogin }: Props) {
+export default function AuthScreen({ onLogin, onTelegramLogin }: Props) {
   const [step, setStep] = useState<AuthStep>("welcome");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
@@ -15,6 +16,28 @@ export default function AuthScreen({ onLogin }: Props) {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [codeError, setCodeError] = useState(false);
+  const tgWidgetRef = useRef<HTMLDivElement>(null);
+
+  // Inject real Telegram Login Widget if bot username is configured
+  useEffect(() => {
+    const botUsername = import.meta.env.VITE_TG_BOT_USERNAME;
+    if (!botUsername || !tgWidgetRef.current || !onTelegramLogin) return;
+    const script = document.createElement("script");
+    script.src = "https://telegram.org/js/telegram-widget.js?22";
+    script.setAttribute("data-telegram-login", botUsername);
+    script.setAttribute("data-size", "large");
+    script.setAttribute("data-radius", "12");
+    script.setAttribute("data-onauth", "onTelegramAuth(user)");
+    script.setAttribute("data-request-access", "write");
+    script.async = true;
+    (window as unknown as Record<string, unknown>)["onTelegramAuth"] = (user: Record<string, string>) => {
+      onTelegramLogin(user);
+    };
+    tgWidgetRef.current.appendChild(script);
+    return () => {
+      if (tgWidgetRef.current) tgWidgetRef.current.innerHTML = "";
+    };
+  }, [step, onTelegramLogin]);
 
   const handleGoogle = () => {
     setLoading(true);
@@ -140,26 +163,30 @@ export default function AuthScreen({ onLogin }: Props) {
               </button>
 
               {/* Telegram */}
-              <button
-                onClick={handleTelegram}
-                disabled={loading}
-                className="w-full flex items-center justify-center gap-3 py-3.5 rounded-2xl mb-6 font-semibold text-sm text-white transition-all duration-200"
-                style={{
-                  background: loading ? "#5BA3D9" : "#229ED9",
-                  boxShadow: "0 2px 8px rgba(34,158,217,0.35)",
-                }}
-                onMouseEnter={e => !loading && (e.currentTarget.style.background = "#1e8fc5")}
-                onMouseLeave={e => !loading && (e.currentTarget.style.background = "#229ED9")}
-              >
-                {loading ? (
-                  <div className="w-5 h-5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
-                ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.98l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.958.579z"/>
-                  </svg>
-                )}
-                Войти через Telegram
-              </button>
+              {import.meta.env.VITE_TG_BOT_USERNAME ? (
+                <div ref={tgWidgetRef} className="flex justify-center mb-6" />
+              ) : (
+                <button
+                  onClick={handleTelegram}
+                  disabled={loading}
+                  className="w-full flex items-center justify-center gap-3 py-3.5 rounded-2xl mb-6 font-semibold text-sm text-white transition-all duration-200"
+                  style={{
+                    background: loading ? "#5BA3D9" : "#229ED9",
+                    boxShadow: "0 2px 8px rgba(34,158,217,0.35)",
+                  }}
+                  onMouseEnter={e => !loading && (e.currentTarget.style.background = "#1e8fc5")}
+                  onMouseLeave={e => !loading && (e.currentTarget.style.background = "#229ED9")}
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.98l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.958.579z"/>
+                    </svg>
+                  )}
+                  Войти через Telegram
+                </button>
+              )}
 
               <div className="flex items-center gap-3 mb-6">
                 <div className="flex-1 h-px" style={{ background: "var(--mrax-border)" }} />

@@ -28,12 +28,17 @@ export interface Message {
 
 export interface User {
   id: number;
+  tg_id?: number;
   name: string;
   username: string;
   avatar: string;
   color: string;
   phone: string;
   bio: string;
+  is_premium?: boolean;
+  premium_until?: string;
+  stars_balance?: number;
+  photo_url?: string;
 }
 
 export const CURRENT_USER: User = {

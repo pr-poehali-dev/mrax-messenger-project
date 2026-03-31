@@ -15,11 +15,13 @@ interface Props {
   onVideoCallStart: () => void;
   onBack?: () => void;
   pinnedMsg?: Message | null;
+  onSendGift?: () => void;
+  stars?: number;
 }
 
 export default function ChatArea({
   contact, messages, onSend, showTranslator, setShowTranslator,
-  invisibleRead, setInvisibleRead, onCallStart, onVideoCallStart, onBack, pinnedMsg,
+  invisibleRead, setInvisibleRead, onCallStart, onVideoCallStart, onBack, pinnedMsg, onSendGift,
 }: Props) {
   const [inputText, setInputText] = useState("");
   const [translateLang, setTranslateLang] = useState("EN");
@@ -31,11 +33,11 @@ export default function ChatArea({
 
   const EMOJIS = ["😊","😂","❤️","👍","🔥","🎉","😭","🙏","😍","😅","🤣","✨","😢","🥰","😎","🤔","👏","😏","🫡","💯","🚀","🎯","💪","🙌"];
   const ATTACH_OPTIONS = [
-    { icon: "Image", label: "Фото", color: "#2A5CFF" },
-    { icon: "FileText", label: "Файл", color: "#FF9F43" },
-    { icon: "Music", label: "Аудио", color: "#FF6B6B" },
-    { icon: "MapPin", label: "Геолокация", color: "#00C48C" },
-    { icon: "Cloud", label: "Из облака", color: "#A55EEA" },
+    { icon: "Image", label: "Фото", color: "#2A5CFF", action: undefined as (() => void) | undefined },
+    { icon: "FileText", label: "Файл", color: "#FF9F43", action: undefined as (() => void) | undefined },
+    { icon: "Music", label: "Аудио", color: "#FF6B6B", action: undefined as (() => void) | undefined },
+    { icon: "Gift", label: "Подарок", color: "#FF9F43", action: onSendGift },
+    { icon: "Cloud", label: "Из облака", color: "#A55EEA", action: undefined as (() => void) | undefined },
   ];
 
   useEffect(() => {
@@ -261,7 +263,7 @@ export default function ChatArea({
       {showAttach && (
         <div className="px-5 py-3 flex gap-3 flex-shrink-0 animate-fade-in" style={{ background: "var(--mrax-chat-bg)", borderTop: "1px solid var(--mrax-border)" }}>
           {ATTACH_OPTIONS.map((opt, i) => (
-            <button key={i} onClick={() => setShowAttach(false)}
+            <button key={i} onClick={() => { setShowAttach(false); opt.action?.(); }}
               className="flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-200"
               style={{ background: opt.color + "15" }}>
               <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: opt.color }}>

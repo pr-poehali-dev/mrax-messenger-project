@@ -13,6 +13,9 @@ interface Props {
   currentUser: User;
   onLogout: () => void;
   onCallHistoryCall: (id: number) => void;
+  stars?: number;
+  onPremium?: () => void;
+  onStars?: () => void;
 }
 
 const TABS = [
@@ -42,7 +45,7 @@ const SETTINGS_ITEMS = [
   { icon: "HelpCircle", label: "Помощь и поддержка", desc: "FAQ и обратная связь" },
 ];
 
-export default function Sidebar({ contacts, selectedChat, onSelectChat, activeTab, onTabChange, onNewChat, onCallStart, currentUser, onLogout, onCallHistoryCall }: Props) {
+export default function Sidebar({ contacts, selectedChat, onSelectChat, activeTab, onTabChange, onNewChat, onCallStart, currentUser, onLogout, onCallHistoryCall, stars = 0, onPremium, onStars }: Props) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
@@ -240,14 +243,36 @@ export default function Sidebar({ contacts, selectedChat, onSelectChat, activeTa
           {/* SETTINGS */}
           {activeTab === "settings" && (
             <div className="px-3 py-2">
-              <div className="flex items-center gap-3 px-3 py-4 rounded-2xl mb-3 animate-scale-in" style={{ background: "var(--mrax-accent-light)" }}>
-                <div className="w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-base" style={{ background: currentUser.color }}>{currentUser.avatar.slice(0, 2)}</div>
+              <div className="flex items-center gap-3 px-3 py-4 rounded-2xl mb-2 animate-scale-in" style={{ background: "var(--mrax-accent-light)" }}>
+                <div className="relative">
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-base overflow-hidden" style={{ background: currentUser.color }}>
+                    {(currentUser as Record<string,unknown>).photo_url ? <img src={(currentUser as Record<string,unknown>).photo_url as string} className="w-full h-full object-cover" alt="" /> : currentUser.avatar.slice(0, 2)}
+                  </div>
+                  {(currentUser as Record<string,unknown>).is_premium && <div className="absolute -bottom-1 -right-1 text-base">⭐</div>}
+                </div>
                 <div className="flex-1">
-                  <div className="font-bold text-sm" style={{ color: "var(--mrax-text)" }}>{currentUser.name}</div>
+                  <div className="font-bold text-sm flex items-center gap-1" style={{ color: "var(--mrax-text)" }}>
+                    {currentUser.name}
+                    {(currentUser as Record<string,unknown>).is_premium && <span className="text-xs font-bold px-1.5 py-0.5 rounded-full text-white" style={{ background: "linear-gradient(135deg,#2A5CFF,#7B3FE4)" }}>Premium</span>}
+                  </div>
                   <div className="text-xs" style={{ color: "var(--mrax-text-secondary)" }}>{currentUser.username}</div>
-                  <div className="text-xs mt-0.5 font-semibold" style={{ color: "var(--mrax-accent)" }}>Изменить профиль</div>
+                  <div className="text-xs mt-0.5 font-bold" style={{ color: "#FF9F43" }}>{stars} ⭐ звёзд</div>
                 </div>
                 <Icon name="ChevronRight" size={16} style={{ color: "var(--mrax-text-secondary)" }} />
+              </div>
+
+              {/* Premium & Stars banners */}
+              <div className="flex gap-2 mb-2">
+                <button onClick={onPremium} className="flex-1 py-2.5 rounded-xl text-center transition-all duration-200"
+                  style={{ background: "linear-gradient(135deg, #2A5CFF 0%, #7B3FE4 100%)" }}>
+                  <div className="text-base">⭐</div>
+                  <div className="text-xs font-bold text-white">Premium</div>
+                </button>
+                <button onClick={onStars} className="flex-1 py-2.5 rounded-xl text-center transition-all duration-200"
+                  style={{ background: "linear-gradient(135deg, #FF9F43, #FF6B6B)" }}>
+                  <div className="text-base">🌟</div>
+                  <div className="text-xs font-bold text-white">Звёзды</div>
+                </button>
               </div>
               {SETTINGS_ITEMS.map((item, i) => (
                 <button key={i}
