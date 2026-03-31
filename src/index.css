@@ -4,8 +4,21 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 0 0% 96.1%;
+    --foreground: 0 0% 20%;
+
+    --mrax-bg: #f5f5f5;
+    --mrax-chat-bg: #ffffff;
+    --mrax-accent: #2a5cff;
+    --mrax-accent-light: #eef2ff;
+    --mrax-notify: #ff6b6b;
+    --mrax-text: #333333;
+    --mrax-text-secondary: #777777;
+    --mrax-border: #e8e8e8;
+    --mrax-sidebar: #ffffff;
+    --mrax-hover: #f0f4ff;
+    --mrax-bubble-out: #2a5cff;
+    --mrax-bubble-in: #ffffff;
 
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -97,5 +110,102 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: "Golos Text", sans-serif;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #d0d0d0 transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #d0d0d0;
+    border-radius: 4px;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease forwards;
+  }
+  .animate-slide-in-right {
+    animation: slideInRight 0.3s ease forwards;
+  }
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease forwards;
+  }
+  .animate-message-in {
+    animation: messageIn 0.25s ease forwards;
+  }
+  .animate-message-out {
+    animation: messageOut 0.25s ease forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes messageOut {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
   }
 }
